@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inline Style & Validation</title>
+</head>
+<body style="font-family: Arial; background-color: #f8f9fa; padding: 30px;">
+  <h2 style="color: #2c3e50;">Registration Form</h2>
+
+  <form id="userForm" style="background: white; padding: 20px; border-radius: 8px; width: 300px;"
+        onsubmit="return validateForm(event)">
+    <label style="display:block; margin-bottom: 10px;">
+      Name: <input type="text" id="name" style="width:100%; padding:5px;">
+    </label>
+
+    <label style="display:block; margin-bottom: 10px;">
+      Email: <input type="email" id="email" style="width:100%; padding:5px;">
+    </label>
+
+    <label style="display:block; margin-bottom: 10px;">
+      Password: <input type="password" id="password" style="width:100%; padding:5px;">
+    </label>
+
+    <label style="display:block; margin-bottom: 10px;">
+      Age: <input type="number" id="age" style="width:100%; padding:5px;">
+    </label>
+
+    <button type="submit" style="background:#3498db; color:white; border:none; padding:10px; width:100%; border-radius:5px;">
+      Submit
+    </button>
+  </form>
+
+  <p id="message" style="margin-top: 15px; color: #e74c3c;"></p>
+
+  <script>
+    async function validateForm(event) {
+      event.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const age = document.getElementById('age').value.trim();
+      const message = document.getElementById('message');
+
+      // Client-side validation
+      if (!name || !email || !password || !age) {
+        message.textContent = "All fields are required!";
+        return false;
+      }
+
+      if (!email.includes('@')) {
+        message.textContent = "Invalid email format!";
+        return false;
+      }
+
+      if (password.length < 6) {
+        message.textContent = "Password must be at least 6 characters!";
+        return false;
+      }
+
+      if (age <= 0) {
+        message.textContent = "Enter a valid age!";
+        return false;
+      }
+
+      // Send to server for validation
+      const response = await fetch('http://localhost:5000/submit', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ name, email, password, age })
+      });
+
+      const data = await response.json();
+      message.style.color = data.success ? 'green' : '#e74c3c';
+      message.textContent = data.message;
+    }
+  </script>
+</body>
+</html>
